@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="content-section container">
+    <form method="post">
+        <!-- to protect our form from attacks -->
+        {{form.hidden_tag()}}
+        <!-- form protection end -->
+
+        <!-- what does this do??? -->
+        {{ form.csrf_token }}
+
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">Log In</legend>
+            <div class="form-group">
+                <!-- <label for="Username"> Username </label> -->
+                {{ form.Username.label }}
+                {{ form.Username (class="form-control form-control-lg", placeholder="create username")}}
+            </div>
+
+            <div class="form-group">
+                <!-- <label for="Password"> Password </label> -->
+                {{ form.Password.label }}
+                {{ form.Password (class="form-control form-control-lg", placeholder="create password")}}
+            </div>
+
+            <div class="form-group">
+                <!-- <label for="ConfirmPassword"> Confirm Password </label> -->
+                {{ form.ConfirmPassword.label}}
+                {{ form.ConfirmPassword (class="form-control form-control-lg", placeholder="confirm password")}}
+            </div>
+            <div class="form-group">
+                {{form.Submit (class="btn btn-outline-info")}}
+            </div>
+        </fieldset>
+    </form>
+</div>
+{% endblock %}
