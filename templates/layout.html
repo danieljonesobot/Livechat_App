@@ -8,29 +8,33 @@
     <!-- Bootstrap cdn -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <!-- <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='main.css')}}"> -->
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
 
     {% if title %}
     <title>Live Chat - {{title}}</title>
     {% else %}
     <title>Live Chat</title>
     {% endif %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+        integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+        crossorigin="anonymous"></script>
 </head>
 
 <body>
 
     <!-- Nav -->
     <nav class="navbar navbar-light bg-primary">
-        <a class="text-white navbar-brand" href="#">
+        <a class="text-white navbar-brand" href="{{url_for('home')}}">
             <img src="{{url_for('static', filename='images/chat img.png')}}" width="30" height="30"
                 class="d-inline-block align-top" alt="">
-            Live Chat
+            Whisper Chat
         </a>
     </nav>
 
 
 
-    <div class="col-md-8">
+    <div class="content">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -43,7 +47,9 @@
         {% endwith %}
 
 
+
         {% block content %}{% endblock %}
+
     </div>
 
     <!-- Optional JavaScript -->

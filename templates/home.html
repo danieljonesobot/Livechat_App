@@ -1,6 +1,32 @@
 {% extends 'layout.html' %}
 
 {% block content %}
+<div class="content">
+    <div class="innerContainer">
+        <form action="" method="post" class="homeForm">
 
-<h1>Hello world</h1>
+            <h3 class="border-bottom pt-3">Enter a chat room</h3>
+            <div>
+                <!-- <label>Name:</label> -->
+                <input type="text" class="form-control form-control-md mx-auto pr-5 pl-5" style="width: 300px;"
+                    placeholder="pick a stage name!" name="name" value="{{name}}">
+            </div>
+
+            <div class="join">
+                <input type="text" class="form-control form-control-md" placeholder=" enter room code" name="code"
+                    value="{{code}}"> &nbsp;&nbsp;
+                <button type="submit" class="btn btn-outline-primary" name="join">Join a Room</button>
+            </div>
+            <button type="submit" class="btn btn-primary" name="create" class="create-btn">Create a
+                Room</button>
+
+            {% if error %}
+            <ul>
+                <li>{{error}}</li>
+            </ul>
+            {% endif %}
+
+        </form>
+    </div>
+</div>
 {% endblock%}

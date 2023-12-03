@@ -1,79 +1,93 @@
 {% extends 'layout.html' %}
 
 {% block content %}
-<div class="content-section container">
-    <form method="POST" action="">
-        <!-- to protect our form from attacks -->
-        {{form.hidden_tag()}}
-        <!-- form protection end -->
+<!-- <div class="content-section container"> -->
+<div class="content">
 
-        <fieldset class="form-group">
-            <legend class="border-bottom mb-4">Log In</legend>
+    <div class="innerContainer">
+        <form method="POST" action="">
+            <!-- to protect our form from attacks -->
+            {{form.hidden_tag()}}
+            <!-- form protection end -->
 
-            <!-- we pass in our fields from the forms here -->
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">Login</legend>
 
-            <div class="form-group">
-                <!-- username label -->
-                {{form.username.label(class="form-control-label")}}
+                <!-- we pass in our fields from the forms here -->
 
-                <!-- username field -->
-                {% if form.username.errors %}
-                {{form.username(class="form-control form-control-lg is-invalid")}}
-                <div class="invalid-feedback">
-                    {% for error in form.username.errors %}
-                    <span>{{error}}</span>
-                    {% endfor %}
+                <div class="form-group">
+                    <!-- username label -->
+                    {{form.username.label(class="form-control-label")}}
+
+                    <!-- username field -->
+                    {% if form.username.errors %}
+                    {{form.username(class="form-control form-control-md is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.username.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
+
+                    {% else %}
+
+                    {{form.username(class="form-control form-control-md", placeholder="username" )}}
+
+                    {% endif %}
+
                 </div>
 
-                {% else %}
 
-                {{form.username(class="form-control form-control-lg", placeholder="Enter your username" )}}
+                <div class="form-group">
+                    <!-- password label -->
+                    {{form.password.label(class="form-control-label")}}
 
-                {% endif %}
+                    <!-- password field -->
+                    {% if form.password.errors %}
+                    {{form.password(class="form-control form-control-md is-invalid")}}
+                    <div class="invalid-feedback">
+                        {% for error in form.password.errors %}
+                        <span>{{error}}</span>
+                        {% endfor %}
+                    </div>
 
-            </div>
+                    {% else %}
 
+                    {{form.password(class="form-control form-control-md", placeholder="password")}}
 
-            <div class="form-group">
-                <!-- password label -->
-                {{form.password.label(class="form-control-label")}}
+                    {% endif %}
 
-                <!-- password field -->
-                {% if form.password.errors %}
-                {{form.password(class="form-control form-control-lg is-invalid")}}
-                <div class="invalid-feedback">
-                    {% for error in form.password.errors %}
-                    <span>{{error}}</span>
-                    {% endfor %}
                 </div>
 
-                {% else %}
+                <div class="form-check">
+                    {{form.remember(class="form-check-input")}}
+                    {{form.remember.label(class="form-check-label")}}
+                </div>
+            </fieldset>
 
-                {{form.password(class="form-control form-control-lg", placeholder="password")}}
-
-                {% endif %}
-
+            <div class="form-group">
+                {{form.submit(class="btn btn-outline-primary")}}
             </div>
 
-            <div class="form-check">
-                {{form.remember(class="form-check-input")}}
-                {{form.remember.label(class="form-check-label")}}
+            <div class="border-top pt-3">
+
+                <a class="ml-2" href="{{url_for('registration')}}">Sign-up</a>
+
+                <small class="text-muted">to create an account.</small>
+
+                <span>
+                    <small class="text-muted ml-2">
+                        <a href="#">Forgot Password?</a>
+                    </small>
+                </span>
             </div>
-        </fieldset>
 
-        <div class="form-group">
-            {{form.submit(class="btn btn-outline-info")}}
-        </div>
 
-        <small class="text-muted ml-2">
-            <a href="#">Forgot Password</a>
-        </small>
-    </form>
+
+        </form>
+
+    </div>
+
 </div>
 
-<div class="border-top pt-3">
-    <small class="text-muted">
-        Need an account? <a class="ml-2" href="{{url_for('registration')}}">Register</a>
-    </small>
-</div>
+
 {% endblock %}
