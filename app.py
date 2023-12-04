@@ -5,7 +5,7 @@ from PIL import Image
 from string import ascii_uppercase
 from flask import Flask, render_template, request, redirect, session, flash, url_for
 from flask_socketio import join_room, leave_room, send, SocketIO
-from flask_login import UserMixin, LoginManager, login_user,logout_user, current_user, login_required
+from flask_login import UserMixin, LoginManager, login_user, logout_user, current_user, login_required
 from flask_sqlalchemy import SQLAlchemy
 from forms.forms import (Registration, LoginForm, UpdateAccountForm)
 from uuid import uuid4
@@ -39,6 +39,10 @@ login_user, current_user, logout_user, login_required '''
 def load_user(user_id):
     return User.query.get(int(user_id))
 
+
+
+
+
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False)
@@ -65,6 +69,8 @@ def generate_unique_code(length):
 @app.route("/", methods=['GET', 'POST'])
 @app.route("/home", methods=['GET', 'POST'])
 def home():
+    '''automatically clears the session when user goes to the home route'''
+    # session.clear()
     if request.method == "POST":
         ''' The get() function gets value of the keys " name, code, join & create" from the "form" dictionary.'''
         name = request.form.get("name")
@@ -87,26 +93,32 @@ def home():
             rooms[room] = {"members":0, "messages":[]}
         elif code not in rooms:
             return render_template("home.hmtl", error="Room does not exist", title='Home', code=code, name=name)    
-    
+
+        session["room"] = room
+        session["name"] = name
     
     return render_template("home.html", title='Home')
 
 
 
 @app.route("/register", methods=["POST","GET"])
-def registration():
+def registration():    
     form = Registration()
-    userName = form.Username.data
-    passWord = form.Password.data
-    if request.method == "POST" and form.validate_on_submit():
-        hashed_password = bcrypt.generate_password_hash(passWord)
-        newuser = User(username = userName, password = hashed_password)
-        user = db.session.query(User).filter_by(username = userName).first()
-        if user is not None:
-            return None # to be change to flash error message
+    if form.validate_on_submit():
+        
+        hashed_password = bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        user = User(username=form.username.data, password=hashed_password)
+        check_user = db.session.query(User).filter_by(username=form.username.data).first()
+
+        if check_user:
+            flash("Username already exists. Please try again", 'warning')
+            return redirect(url_for('registration'))
         else:
-            db.session.add(newuser)
+            db.session.add(user)
             db.session.commit()
+
+            flash('Account created Successfully! Please Proceed to log in', 'success')
+            return redirect(url_for('login'))
     return render_template("register.html", title='Register', form=form)
 
 
@@ -118,10 +130,20 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            flash(f'Welcome {user.username}!!', 'success')
+            flash(f'Welcome {user.username}', 'success')
+            return redirect(url_for("home"))
         else:
             flash("Login failed. Please check username and password", 'danger')
     return render_template("login.html", title='Login', form=form)
+
+
+
+
+
+@app.route("/logout")
+def logout():
+    logout_user()
+    return redirect(url_for("home"))
 
 
 
@@ -133,6 +155,7 @@ def save_picture(form_picture):
     
     form_picture.save(picture_path)
 
+    '''resizes image to smaller size'''
     output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
@@ -144,25 +167,23 @@ def save_picture(form_picture):
 
 '''Route to display user info'''
 @app.route("/profile", methods=['GET', 'POST'])
-# @login_required
+@login_required
 def profile():
-     form = UpdateAccountForm()
-     if form.validate_on_submit():
-         '''if a picture is uploaded'''
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+         '''if a value is provided / a picture is uploaded'''
          if form.picture.data:
-             picture_file = save_picture(form.picture.data)
-             current_user.image_file = picture_file
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
          current_user.username = form.username.data
-         current_user.email = form.email.data
+        #  current_user.email = form.email.data
          db.session.commit()
-         flash("Account details updated", 'success')
+         flash("Your account information has been updated", 'success')
          return redirect(url_for('profile'))
-     elif request.method == 'GET':
-         form.username.data = current_user.username
-         form.email.data = current_user.email
-         '''current user image is the default img in the static/profile_pics directory'''
-     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
-     return render_template('profile.html', title='Profile', image_file=image_file, form=form)
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('profile.html', title='Profile', image_file=image_file, form=form)
 
 
 
@@ -170,5 +191,7 @@ def profile():
 
 
 if __name__ == "__main__":
+    # with app.app_context():
+    #     db.create_all()
     # app.run(debug=True)
     socketio.run(app, debug=True)

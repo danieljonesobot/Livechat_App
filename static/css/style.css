@@ -5,6 +5,14 @@
     padding: 20px 70px 50px 70px;
 }
 
+.flashmsg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 10px;
+    margin-bottom: -20px;
+}
+
 
 .innerContainer {
     border: 1px solid grey;

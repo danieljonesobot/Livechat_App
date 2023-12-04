@@ -16,6 +16,7 @@
     <title>Live Chat</title>
     {% endif %}
 
+    <!-- socketIO cdn -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
         integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
         crossorigin="anonymous"></script>
@@ -34,7 +35,7 @@
 
 
 
-    <div class="content">
+    <div class="flashmsg">
         {% with messages = get_flashed_messages(with_categories=true) %}
         {% if messages %}
         {% for category, message in messages %}
@@ -48,9 +49,11 @@
 
 
 
-        {% block content %}{% endblock %}
+
 
     </div>
+
+    {% block content %}{% endblock %}
 
     <!-- Optional JavaScript -->
     <!-- jQuery first, then Popper.js, then Bootstrap JS -->

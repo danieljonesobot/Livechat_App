@@ -1,12 +1,13 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import StringField, PasswordField, HiddenField, SubmitField, BooleanField
-from wtforms.validators import DataRequired, EqualTo, Email, Length
+from wtforms.validators import DataRequired, EqualTo, Email, Length, ValidationError
+
 
 class Registration(FlaskForm):
-    Username = StringField("Username",validators=[DataRequired()])
-    Password = PasswordField("Password", validators=[DataRequired()])
-    ConfirmPassword = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("Password", message="Password does not match")])
+    username = StringField("Username",validators=[DataRequired()])
+    password = PasswordField("Password", validators=[DataRequired()])
+    confirmPassword = PasswordField("Confirm Password", validators=[DataRequired(), EqualTo("password", message="Passwords do not match. Try again.")])
     Submit = SubmitField("Sign up")
 
 
@@ -20,6 +21,6 @@ class LoginForm(FlaskForm):
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired(), Length(min=2, max=20)])
-    email = StringField('Email', validators=[DataRequired(), Email()])
-    picture = FileField('Update profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
+    # email = StringField('Email', validators=[DataRequired(), Email()])
+    picture = FileField('Change profile picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'], message="Accepted file formats are jpg, png & jpeg ONLY")])
     submit = SubmitField('Update')
