@@ -24,14 +24,18 @@ db = SQLAlchemy(app)
 
 
 '''
-*********************
-    DEPENDENCIES
-*********************
-
-- pip install flask-socketio
-
+            DEPENDENCIES
+******************************************
+pip install flask-socketio
+pip install flask
+pip install Pillow
+pip install flask-SQLAlchemy
+pip install flask-bcrypt
+pip install flask-login
 
 '''
+
+
 
 '''You must add this function.  It is an extension of LoginManager and its associated functions i.e
 login_user, current_user, logout_user, login_required '''
@@ -66,17 +70,25 @@ def generate_unique_code(length):
 
 
 
+
+
 @app.route("/", methods=['GET', 'POST'])
+@app.route("/landing", methods=['GET', 'POST'])
+def landing():
+    return render_template("landing.html")
+
+
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    '''automatically clears the session when user goes to the home route'''
+    '''session.clear() function automatically clears the session when user goes to the home route'''
     # session.clear()
     if request.method == "POST":
-        ''' The get() function gets value of the keys " name, code, join & create" from the "form" dictionary.'''
+        ''' The get() function gets value of the keys " name, code, join & create" from the 
+        form(which is a dictionary) in the home.html template.'''
         name = request.form.get("name")
         code = request.form.get("code")
-        ''' Here, if the keys do not have a value it returns None.  
-        By passing "False" as an argument we set the default value to be False'''
+        ''' Here, if the keys do not have a value it returns None as it default value.  
+        By passing "False" as an argument we set the default value to be False instead'''
         join = request.form.get("join", False)
         create = request.form.get("create", False)
 
@@ -84,7 +96,7 @@ def home():
             return render_template("home.html", error="Please Enter a Name", title='Home', code=code, name=name)
         
         if join != False and code is None:
-            return render_template("home.html", error="Please a room code", title='Home', code=code, name=name)
+            return render_template("home.html", error="Please enter a room code", title='Home', code=code, name=name)
         
 
         room = code
@@ -94,10 +106,74 @@ def home():
         elif code not in rooms:
             return render_template("home.hmtl", error="Room does not exist", title='Home', code=code, name=name)    
 
+        '''else if values are provided for room and name, create and store sessions and redirect to room route'''
         session["room"] = room
         session["name"] = name
+        return redirect(url_for("room"))
     
     return render_template("home.html", title='Home')
+
+
+
+@app.route("/room")
+def room():
+    room = session.get("room")
+    if room is None or session.get("name") is None or room not in rooms:
+        return redirect(url_for("home"))
+    return render_template("room.html")
+
+
+
+@socketio.on("connect")
+def connect(auth):
+    '''we get the room and name sessions and store them in '''
+    room = session.get("room")
+    name = session.get("name")
+    '''checks that a user can't connect to the socket without going through the home route'''
+    if not room or not name:
+        return
+    
+    '''if the user's room does not exist in "rooms", then we use the built-in leave_room() 
+    function in socket to exit the user and return'''
+    if room not in rooms:
+        leave_room(room)
+        return
+    
+
+    '''else, if the user's room exist, we use the join_room() function in socket to admit the user to the 
+    room and also send a general message in the room that the user has joined using the built-in send()
+    function in socket and increase the number of members in the room by 1'''
+    
+    join_room(room)
+    send({"name":name, "message":"has entered the room"}, to=room)
+    rooms[room]["members"] += 1
+    print(f"{name} joined room {room}")
+
+
+
+
+
+'''socket for user to leave room'''
+@socketio.on("disconnect")
+def disconnect(auth):
+    room = session.get("room")
+    name = session.get("name")
+    leave_room(room)
+
+    if room in rooms:
+        rooms[room]["members"] -=1
+        if rooms[room]["members"] <= 0:
+            del rooms[room]
+
+
+    send({"name":name, "message":"has left the room"}, to=room)
+    print(f"{name} has left the room {room}")
+
+
+
+
+
+
 
 
 
@@ -130,7 +206,7 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
-            flash(f'Welcome {user.username}', 'success')
+            flash(f'Welcome {user.username}! 😀', 'success')
             return redirect(url_for("home"))
         else:
             flash("Login failed. Please check username and password", 'danger')
@@ -143,7 +219,8 @@ def login():
 @app.route("/logout")
 def logout():
     logout_user()
-    return redirect(url_for("home"))
+    flash("You have been Logged out 😔", "success")
+    return redirect(url_for("landing"))
 
 
 
@@ -155,8 +232,8 @@ def save_picture(form_picture):
     
     form_picture.save(picture_path)
 
-    '''resizes image to smaller size'''
-    output_size = (125, 125)
+    '''resizes image to smaller size of 300 by 300 pixels'''
+    output_size = (300, 300)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
     i.save(picture_path)

@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+
+{% block content %}
+
+
+<section class="landingFirstSection">
+    <div>
+        <img src="{{url_for('static', filename='images/smiling_lady.jpeg')}}" alt="smiling_lady"
+            style="width: 500px; height: 400px;">
+    </div>
+    <div>
+        <h1>Connecting you to people and places...</h1>
+    </div>
+
+
+</section>
+
+
+<section class="landingSecondSection">
+    <div>
+        <h1>Make new friends while you chat on Live chat!</h1>
+    </div>
+    <div>
+        <img src="{{url_for('static', filename='images/ladies.jpg')}}" alt="ladies_smiling"
+            style="width: 700px; height: 300px; border:1px solid #dae2e2;;">
+    </div>
+</section>
+
+{% endblock %}
