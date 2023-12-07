@@ -1,1 +1,1 @@
-Backup Repo for LivechatApp code base
+Live Chat Web Application developed with flask and socketio. The app allows users to chat with other users in real time. Users can create accounts, upload and update their profile pictures, engage with other users and send messages to other users real time.

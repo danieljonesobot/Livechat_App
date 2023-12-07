@@ -72,10 +72,17 @@ def generate_unique_code(length):
 
 
 
-@app.route("/", methods=['GET', 'POST'])
-@app.route("/landing", methods=['GET', 'POST'])
+@app.route("/")
+@app.route("/landing")
 def landing():
     return render_template("landing.html")
+
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
 
 
 @app.route("/home", methods=['GET', 'POST'])
