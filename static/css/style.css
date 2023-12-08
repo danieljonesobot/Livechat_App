@@ -1,3 +1,7 @@
+body {
+    color: #292b2c;
+}
+
 .content {
     display: flex;
     align-items: center;
