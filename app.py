@@ -46,12 +46,28 @@ def load_user(user_id):
 
 
 
-
+'''Models'''
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
     image_file = db.Column(db.String(20), nullable=False, default='default.jpg')
+
+
+
+
+@app.route("/")
+@app.route("/landing")
+def landing():
+    return render_template("landing.html")
+
+
+
+@app.route("/about")
+def about():
+    return render_template("about.html")
+
+
 
 
 
@@ -72,23 +88,10 @@ def generate_unique_code(length):
 
 
 
-@app.route("/")
-@app.route("/landing")
-def landing():
-    return render_template("landing.html")
-
-
-
-@app.route("/about")
-def about():
-    return render_template("about.html")
-
-
-
 @app.route("/home", methods=['GET', 'POST'])
 def home():
     '''session.clear() function automatically clears the session when user goes to the home route'''
-    # session.clear()
+    session.clear()
     if request.method == "POST":
         ''' The get() function gets value of the keys " name, code, join & create" from the 
         form(which is a dictionary) in the home.html template.'''
@@ -214,7 +217,7 @@ def login():
         if user and bcrypt.check_password_hash(user.password, form.password.data):
             login_user(user, remember=form.remember.data)
             flash(f'Welcome {user.username}! 😀', 'success')
-            return redirect(url_for("home"))
+            return redirect(url_for("profile"))
         else:
             flash("Login failed. Please check username and password", 'danger')
     return render_template("login.html", title='Login', form=form)
@@ -255,7 +258,7 @@ def save_picture(form_picture):
 def profile():
     form = UpdateAccountForm()
     if form.validate_on_submit():
-         '''if a value is provided / a picture is uploaded'''
+         '''if a value is provided the picture field or simply put, if a picture is uploaded'''
          if form.picture.data:
             picture_file = save_picture(form.picture.data)
             current_user.image_file = picture_file
