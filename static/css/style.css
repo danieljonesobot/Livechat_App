@@ -171,3 +171,21 @@ body {
 #message {
     flex: 1;
 }
+
+
+.text {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 40px;
+    padding-right: 40px;
+}
+
+
+
+
+.muted {
+    font-size: 10px;
+    color: darkgray;
+}

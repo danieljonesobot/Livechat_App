@@ -70,7 +70,7 @@ def about():
 
 
 
-
+# rooms is a dictionary which stores another dictionary, room.
 rooms = {}
 
 
@@ -90,33 +90,37 @@ def generate_unique_code(length):
 
 @app.route("/home", methods=['GET', 'POST'])
 def home():
-    '''session.clear() function automatically clears the session when user goes to the home route'''
-    session.clear()
+    '''session.clear() function will automatically clear the session which contains
+     user data when user goes to the home route. Keep commented'''
+    # session.clear()
     if request.method == "POST":
-        ''' The get() function gets value of the keys " name, code, join & create" from the 
-        form(which is a dictionary) in the home.html template.'''
+        # The get() function gets value of the keys " name, code, join & create" from the 
+        # form(which is a dictionary) in the home.html template.
         name = request.form.get("name")
         code = request.form.get("code")
-        ''' Here, if the keys do not have a value it returns None as it default value.  
-        By passing "False" as an argument we set the default value to be False instead'''
+        #Here, if the keys do not have a value it returns None as it default value.  
+        #By passing "False" as an argument we set the default value to be False instead
         join = request.form.get("join", False)
         create = request.form.get("create", False)
 
         if not name:
+            flash("Please enter a name", 'danger')
             return render_template("home.html", error="Please Enter a Name", title='Home', code=code, name=name)
         
-        if join != False and code is None:
-            return render_template("home.html", error="Please enter a room code", title='Home', code=code, name=name)
+        if join != False and not code:
+            flash("Please enter a room code", 'danger')
+            return render_template("home.html", title='Home',  error="Please enter a room code", code=code, name=name)
         
 
         room = code
         if create != False:
             room = generate_unique_code(4)
+            #creates a room dictionary with 'members' and 'messages' as keys value pairs and stores in rooms
             rooms[room] = {"members":0, "messages":[]}
-        elif code not in rooms:
+        elif room not in rooms:
             return render_template("home.hmtl", error="Room does not exist", title='Home', code=code, name=name)    
 
-        '''else if values are provided for room and name, create and store sessions and redirect to room route'''
+        # else if values are provided for room and name, create and store sessions and redirect to room route
         session["room"] = room
         session["name"] = name
         return redirect(url_for("room"))
@@ -130,16 +134,45 @@ def room():
     room = session.get("room")
     if room is None or session.get("name") is None or room not in rooms:
         return redirect(url_for("home"))
-    return render_template("room.html")
+    # for the third argument "messages", we access the messages key which is a list in the room dictionary
+    return render_template("room.html", code=room, messages=rooms[room]["messages"])
+
+
+
+# this function receives the message from the event on one of the clients on the client-side (room.html)
+# on our server and sends the message to all the other connected sockets
+@socketio.on("sendit")
+def sendit(data):
+    # we get the room from the client that is sending the message and if it doesn't exist, simply returns
+    room = session.get("room")
+    if room not in rooms:
+        return
+    
+    # else we get the name of the client that is sending the message from the client-side
+    # the first "data" is the key while the second is the value from the client-side
+    
+    content = {
+        "name": session.get("name"),
+        "message": data["data"]
+    }
+
+    # then we use the send function to parse "content" to the other connected sockets in the room
+    # then we access the key "messages" in the room dictionary and append content to the list
+    send(content, to=room)
+    rooms[room]["messages"].append(content)
+    print(f"{session.get('name')} said: {data['data']}")
+
+
+
 
 
 
 @socketio.on("connect")
 def connect(auth):
-    '''we get the room and name sessions and store them in '''
+    '''we get the room and name sessions and store them in variables '''
     room = session.get("room")
     name = session.get("name")
-    '''checks that a user can't connect to the socket without going through the home route'''
+    '''checks if there is no session and ensures a user can't connect to the socket without going through the home route'''
     if not room or not name:
         return
     
@@ -165,7 +198,7 @@ def connect(auth):
 
 '''socket for user to leave room'''
 @socketio.on("disconnect")
-def disconnect(auth):
+def disconnect():
     room = session.get("room")
     name = session.get("name")
     leave_room(room)

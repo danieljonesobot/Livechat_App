@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="message-box">
-    <h2 class="roomh2">Chat Room: {{room}}</h2>
+    <h2 class="roomh2">Chat Room: {{code}}</h2>
     <div class="messages" id="messages"></div>
     <div class="inputs">
         <input class="form-control form-control-md" type="text" rows="3" placeholder="Message" name="message"
@@ -14,8 +14,57 @@
 <script type="text/javaScript">
     var socketio = io();
 
+    const messages = document.getElementById("messages")
+
+    const createMessage = (name, msg) => {
+        const content = `
+        <div class="text">
+            <span>
+                <strong>${name}</strong>: ${msg}
+            </span> 
+            
+            <span class="muted">
+                ${new Date().toLocaleString()}
+            </span>  
+        </div>
+        `;
+
+        messages.innerHTML += content;
+    };
+
+
+    //This takes care of notifying all sockets that a user has entered the room as defined in app.py.
+    //It takes two arguments. First argument is a message event which it listens for. You can name it anything
+    //which will be transmitted from the flask server on app.py
+    //the second argument is a call back function and it is going to contain data 
+    //which will have whatever was sent from the payload being sent from app.py, 
+    //through data, we access name and message
+    //it then calls the createMessage function which renders their respective values 
+    socketio.on("message", (data) => {
+        createMessage(data.name, data.message)
+    })
+
+
+
+    // using the onClick property, when the send button is pressed, creates an event on the client-side
+    // which the server will listen for in the server-side...the event can be named anything
     const sendMessage = () => {
-        console.log("send");
+        // we access the input element with the id of "message" and its value
+        // if no value is supplied, simply return, else
+        const message = document.getElementById("message")
+        if (message.value == "") return;
+        socketio.emit("sendit", {data: message.value})
+        message.value = "";
     };
 </script>
+
+{% for msg in messages %}
+
+<script type="text/javaScript">
+    createMessage("{{msg.name}}", "{{msg.message}}");
+</script>
+
+{% endfor %}
+
+
 {% endblock %}
