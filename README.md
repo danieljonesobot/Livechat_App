@@ -8,8 +8,13 @@ The Application is developed with flask and socketio. The app allows users to ch
 
 
 
-## URL to Deployed Application
+
+
+## Link to Deployed Application
 danieljonesobot.pythonanywhere.com/
+
+
+
 
 
 
@@ -51,5 +56,5 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 
 `for db in my_cursor:`
 
-
     `print(db)`
+
