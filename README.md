@@ -8,6 +8,9 @@ The Application is developed with flask and socketio. The app allows users to ch
 
 
 
+## URL to Deployed Application
+danieljonesobot.pythonanywhere.com/
+
 
 
 ## Technologies
@@ -21,7 +24,7 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 - Python
 - Flask
 - SQLAlchemy
-- Socet.IO
+- Socket.IO
 - Mysql
 
 
@@ -33,7 +36,7 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 `mydb = mysql.connector.connect(`
 `host="root",`
 `user="yourusername"`,
-`passwd="yourpassword",`
+`passwd="yourpassword"`
 `)`
 
 
@@ -44,5 +47,9 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 
 
 `my_cursor.execute("SHOW DATABASES")`
+
+
 `for db in my_cursor:`
+
+
     `print(db)`
