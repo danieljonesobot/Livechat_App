@@ -28,23 +28,22 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 
 ## How to create and connect local Mysql DB
 
-`html`
 
-`#python script to create a DB on local machine
-import mysql.connector
+`#python script to create a DB on local machine`
+`import mysql.connector`
 
-mydb = mysql.connector.connect(
-host="root",
-user="yourusername",
-passwd="yourpassword",
-)
+`mydb = mysql.connector.connect(`
+`host="root",`
+`user="yourusername"`,
+`passwd="yourpassword",`
+`)`
 
 
-my_cursor = mydb.cursor()
+`my_cursor = mydb.cursor()`
 
-my_cursor.execute("CREATE DATABASE database_name")
+`my_cursor.execute("CREATE DATABASE database_name")`
 
-#list all databases present on the console
-my_cursor.execute("SHOW DATABASES")
-for db in my_cursor:
-    print(db)`
+`#list all databases present on the console`
+`my_cursor.execute("SHOW DATABASES")`
+`for db in my_cursor:`
+    `print(db)`
