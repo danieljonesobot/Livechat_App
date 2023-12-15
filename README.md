@@ -21,8 +21,7 @@ The Application is developed with flask and socketio. The app allows users to ch
 
 ## How to create and connect local Mysql DB
 
-` 
-#python script to create a DB on local machine
+`#python script to create a DB on local machine
 import mysql.connector
 
 mydb = mysql.connector.connect(
@@ -39,5 +38,4 @@ my_cursor.execute("CREATE DATABASE database_name")
 #list all databases present on the console
 my_cursor.execute("SHOW DATABASES")
 for db in my_cursor:
-    print(db) 
-`
+    print(db)`
