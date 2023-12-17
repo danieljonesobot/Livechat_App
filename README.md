@@ -2,7 +2,7 @@
 
 
 ## About the Project
-This is my final project at ALX SE Program.  This project was designed with a passion for fostering instant and meaningful conversations and connecting people.  The platform provides a user-friendly and efficient way to engage in real-time conversations.
+This is my final project done at ALX SE Program.  This project was designed with a passion for fostering instant and meaningful conversations and connecting people.  The platform provides a user-friendly and efficient way to engage in real-time conversations.
 
 The Application is developed with flask and socketio. The app allows users to chat with other users in real time. Users can create accounts, upload and update their profile pictures, engage with other users and send messages to other users real time.
 
@@ -38,8 +38,11 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 
 ## Connectors for Mysql 
 `pip install mysql-connector`
+
 `pip install mysql-connector-python`
+
 `pip install mysql-connector-python-rf`
+
 `pip install pymysql`
 
 
@@ -72,6 +75,9 @@ I used HTML5, CSS3, JavaScript and bootstrap for the frontend development.  Then
 `my_cursor.execute("SHOW DATABASES")`
 
 
+''' loop through to see all databases created '''
+
 `for db in my_cursor:`
-    `print(db)`
+
+   `print(db)`
 
