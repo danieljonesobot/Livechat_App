@@ -13,6 +13,17 @@ from flask_bcrypt import Bcrypt
 
 app = Flask(__name__)
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+
+# app.config["DEBUG"] = True
+# username="******"
+# password="******"
+# hostname="******.mysql.pythonanywhere-services.com"
+# databasename="********$livechatapp"
+
+# app.config["SQLALCHEMY_DATABASE_URI"] = "mysql+mysqlconnector://{0}:{1}@{2}/{3}".format(username, password, hostname, databasename)
+# app.config["SQLALCHEMY_POOL_RECYCLE"] = 299
+# app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+
 app.config["SECRET_KEY"] = str(uuid4())
 socketio = SocketIO(app)
 bcrypt = Bcrypt(app)
@@ -33,6 +44,28 @@ pip install flask-SQLAlchemy
 pip install flask-bcrypt
 pip install flask-login
 
+# next 3 packages are to connect the app to Mysql DB
+pip install mysql-connector 
+pip install mysql-connector-python
+pip install mysql-connector-python-rf
+
+#python script to create a DB on local machine
+import mysql.connector
+
+mydb = mysql.connector.connect(
+host="danieljonesobot.mysql.pythonanywhere-services.com",
+user="danieljonesobot",
+passwd="starlink",
+)
+
+
+my_cursor = mydb.cursor()
+
+my_cursor.execute("CREATE DATABASE danieljonesobot$livechatapp")
+
+my_cursor.execute("SHOW DATABASES")
+for db in my_cursor:
+    print(db)
 '''
 
 
@@ -48,6 +81,7 @@ def load_user(user_id):
 
 '''Models'''
 class User(db.Model, UserMixin):
+    __tablename__ = "user"
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), nullable=False)
     password = db.Column(db.String(50), nullable=False)
@@ -73,7 +107,7 @@ def about():
 # rooms is a dictionary which stores another dictionary, room.
 rooms = {}
 
-
+'''factory function to generate a unique code'''
 def generate_unique_code(length):
     while True:
         code = ""
@@ -89,6 +123,7 @@ def generate_unique_code(length):
 
 
 @app.route("/home", methods=['GET', 'POST'])
+@login_required
 def home():
     '''session.clear() function will automatically clear the session which contains
      user data when user goes to the home route. Keep commented'''
@@ -99,7 +134,7 @@ def home():
         name = request.form.get("name")
         code = request.form.get("code")
         #Here, if the keys do not have a value it returns None as it default value.  
-        #By passing "False" as an argument we set the default value to be False instead
+        #By passing "False" as the second argument, we set the default value to be False instead
         join = request.form.get("join", False)
         create = request.form.get("create", False)
 
@@ -111,8 +146,9 @@ def home():
             flash("Please enter a room code", 'danger')
             return render_template("home.html", title='Home',  error="Please enter a room code", code=code, name=name)
         
-
         room = code
+
+
         if create != False:
             room = generate_unique_code(4)
             #creates a room dictionary with 'members' and 'messages' as keys value pairs and stores in rooms
@@ -124,13 +160,14 @@ def home():
         session["room"] = room
         session["name"] = name
         return redirect(url_for("room"))
-    
+   
     return render_template("home.html", title='Home')
 
 
 
 @app.route("/room")
 def room():
+    #get the room session from user trying to access the room
     room = session.get("room")
     if room is None or session.get("name") is None or room not in rooms:
         return redirect(url_for("home"))
@@ -143,7 +180,7 @@ def room():
 # on our server and sends the message to all the other connected sockets
 @socketio.on("sendit")
 def sendit(data):
-    # we get the room from the client that is sending the message and if it doesn't exist, simply returns
+    # we get the room from the client that is sending the message and if it doesn't exist, it simply returns
     room = session.get("room")
     if room not in rooms:
         return
@@ -267,6 +304,7 @@ def logout():
 
 
 
+'''function to save picture'''
 def save_picture(form_picture):
     random_hex = secrets.token_hex(8)
     _f_name, f_ext = os.path.splitext(form_picture.filename)

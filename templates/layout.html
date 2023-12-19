@@ -8,7 +8,11 @@
     <!-- Bootstrap cdn -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
         integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <!-- Vanilla CSS -->
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='css/style.css')}}">
+
+    <!-- Logo -->
     <link rel="icon" href="{{url_for('static', filename='images/logo2.png')}}" type="image/x-icon">
 
 
@@ -38,11 +42,16 @@
 
 
         <!-- Navbar Right Side -->
-        <div class="navbar-nav">
+        <div class="navbar-nav" id="nav-links">
             {% if current_user.is_authenticated %}
             <a class="text-white nav-item nav-link" href="{{url_for('home')}}">Lobby</a>
             <a class="text-white nav-item nav-link" href="{{url_for('profile')}}">Profile</a>
             <a class="text-white nav-item nav-link" href="{{url_for('logout')}}">Logout</a>
+            <div>
+                <img src="{{ url_for('static', filename='profile_pics/user1.png') }}" alt="image_file"
+                    style="height: 35px; width: 35px; border-radius: 50%;">
+                <span style="color: white;">{{current_user.username}}</span>
+            </div>
             {% else %}
             <a class="text-white nav-item nav-link" href="{{url_for('landing')}}">Home</a>
             <a class="text-white nav-item nav-link" href="{{url_for('login')}}">Login</a>

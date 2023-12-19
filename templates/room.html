@@ -33,11 +33,12 @@
     };
 
 
-    //This takes care of notifying all sockets that a user has entered the room as defined in app.py.
+    //This takes care of transmitting to all sockets
+    //It notifies all sockets that a user has entered the room as defined in app.py.
     //It takes two arguments. First argument is a message event which it listens for. You can name it anything
     //which will be transmitted from the flask server on app.py
-    //the second argument is a call back function and it is going to contain data 
-    //which will have whatever was sent from the payload being sent from app.py, 
+    //the second argument is a call back function and it is going to contain data/payload 
+    //which will have whatever was sent from the payload being sent to app.py, 
     //through data, we access name and message
     //it then calls the createMessage function which renders their respective values 
     socketio.on("message", (data) => {
@@ -45,17 +46,36 @@
     })
 
 
-
+     //function that listens for the click of a button to send message
     // using the onClick property, when the send button is pressed, creates an event on the client-side
-    // which the server will listen for in the server-side...the event can be named anything
+    // which the server will listen for on the server-side...the event can be named anything
     const sendMessage = () => {
         // we access the input element with the id of "message" and its value
         // if no value is supplied, simply return, else
         const message = document.getElementById("message")
         if (message.value == "") return;
+
         socketio.emit("sendit", {data: message.value})
         message.value = "";
+
     };
+
+
+    //function that listens for a keyboard press event to send message
+    const sendmsg = () => {
+        const message = document.getElementById("message")
+        message.addEventListener("keyup", function(event){
+            if (event.key == "Enter") {
+                socketio.emit("sendit", {data: message.value})
+                message.value = "";
+            }
+        })
+    };
+
+    sendmsg();
+
+
+
 </script>
 
 {% for msg in messages %}
