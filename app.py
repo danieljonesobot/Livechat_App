@@ -53,9 +53,9 @@ pip install mysql-connector-python-rf
 import mysql.connector
 
 mydb = mysql.connector.connect(
-host="danieljonesobot.mysql.pythonanywhere-services.com",
-user="danieljonesobot",
-passwd="starlink",
+host="********.mysql.pythonanywhere-services.com",
+user="********",
+passwd="********",
 )
 
 
